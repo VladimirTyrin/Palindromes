@@ -21,7 +21,20 @@ namespace PalindromeTest
             return true;
         }
 
-        private static int[] FindPrimes(int start, int end)
+        private static int[] FindPrimes(int start, int end, bool allowParallel)
+        {
+            return allowParallel
+                ? FindPrimesParallel(start, end)
+                : FindPrimesSequential(start, end);
+        }
+
+        private static int[] FindPrimesSequential(int start, int end)
+        {
+            var count = end - start;
+            return Enumerable.Range(start, count).Where(IsPrime).ToArray();
+        }
+
+        private static int[] FindPrimesParallel(int start, int end)
         {
             var count = end - start;
             return Enumerable.Range(start, count).AsParallel().Where(IsPrime).ToArray();
@@ -50,7 +63,14 @@ namespace PalindromeTest
             return true;
         }
 
-        private static (long max, long first, long second) FindLargestPalindrome(int[] primes)
+        private static (long max, long first, long second) FindLargestPalindrome(int[] primes, bool allowParallel)
+        {
+            return allowParallel
+                ? FindLargestPalindromeParallel(primes)
+                : FindLargestPalindromeSequential(primes);
+        }
+
+        private static (long max, long first, long second) FindLargestPalindromeParallel(int[] primes)
         {
             var max = 0L;
             long first = 0;
@@ -77,12 +97,40 @@ namespace PalindromeTest
             return (max, first, second);
         }
 
+        private static (long max, long first, long second) FindLargestPalindromeSequential(int[] primes)
+        {
+            var max = 0L;
+            long first = 0;
+            long second = 0;
+
+            foreach (var firstPrime in primes)
+            {
+                foreach (var secondPrime in primes)
+                {
+                    var product = (long)firstPrime * secondPrime;
+                    if (!IsPalindrome(product))
+                        continue;
+
+                    //Console.WriteLine($"{product} = {firstPrime} * {secondPrime}");
+                    if (product <= max)
+                        continue;
+
+                    max = product;
+                    first = firstPrime;
+                    second = secondPrime;
+                }
+            }
+
+            return (max, first, second);
+        }
+
         private static void Main(string[] args)
         {
+            var allowParallel = false;
             var sw = Stopwatch.StartNew();
-            var primes = FindPrimes(10_000, 99_999);
+            var primes = FindPrimes(10_000, 99_999, allowParallel);
 
-            var (max, first, second) = FindLargestPalindrome(primes);
+            var (max, first, second) = FindLargestPalindrome(primes, allowParallel);
 
             Console.WriteLine($"MAX: {max} = {first} * {second} ({sw.ElapsedMilliseconds} ms)");
         }
