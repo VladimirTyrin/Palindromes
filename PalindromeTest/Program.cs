@@ -42,6 +42,10 @@ namespace PalindromeTest
 
         private static bool IsPalindrome(long number)
         {
+            // 10-digit palindromes will always have 11 as a dvivider
+            if (number >= 1_000_000_000L)
+                return false;
+
             var digits = new List<long>();
             while (number > 0)
             {
@@ -80,11 +84,13 @@ namespace PalindromeTest
             {
                 foreach (var secondPrime in primes)
                 {
+                    if (secondPrime < firstPrime)
+                        continue;
+
                     var product = (long)firstPrime * secondPrime;
                     if (!IsPalindrome(product))
                         continue;
 
-                    //Console.WriteLine($"{product} = {firstPrime} * {secondPrime}");
                     if (product <= max)
                         continue;
 
@@ -103,16 +109,18 @@ namespace PalindromeTest
             long first = 0;
             long second = 0;
 
-            foreach (var firstPrime in primes)
+            for (var firstIndex = 0; firstIndex < primes.Length; firstIndex++)
             {
-                foreach (var secondPrime in primes)
+                var firstPrime = primes[firstIndex];
+                for (var index = firstIndex; index < primes.Length; index++)
                 {
-                    var product = (long)firstPrime * secondPrime;
-                    if (!IsPalindrome(product))
+                    var secondPrime = primes[index];
+                    var product = (long) firstPrime * secondPrime;
+
+                    if (product <= max)
                         continue;
 
-                    //Console.WriteLine($"{product} = {firstPrime} * {secondPrime}");
-                    if (product <= max)
+                    if (!IsPalindrome(product))
                         continue;
 
                     max = product;
