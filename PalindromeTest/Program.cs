@@ -80,10 +80,12 @@ namespace PalindromeTest
             long first = 0;
             long second = 0;
 
-            Parallel.ForEach(primes, firstPrime =>
+            Parallel.For(0, primes.Length, firstIndex =>
             {
-                foreach (var secondPrime in primes)
+                var firstPrime = primes[firstIndex];
+                for (var index = firstIndex; index < primes.Length; index++)
                 {
+                    var secondPrime = primes[index];
                     if (secondPrime < firstPrime)
                         continue;
 
