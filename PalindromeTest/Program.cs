@@ -88,10 +88,11 @@ namespace PalindromeTest
                         continue;
 
                     var product = (long)firstPrime * secondPrime;
-                    if (!IsPalindrome(product))
-                        continue;
 
                     if (product <= max)
+                        continue;
+
+                    if (!IsPalindrome(product))
                         continue;
 
                     Interlocked.Exchange(ref max, product);
@@ -134,7 +135,7 @@ namespace PalindromeTest
 
         private static void Main(string[] args)
         {
-            var allowParallel = false;
+            var allowParallel = true;
             var sw = Stopwatch.StartNew();
             var primes = FindPrimes(10_000, 99_999, allowParallel);
 
